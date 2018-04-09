@@ -1,6 +1,6 @@
 module.exports = function (feed, res) {
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
-  
+
   var archive = feed.metadata ? feed : null
 
   if (archive) {
@@ -11,7 +11,7 @@ module.exports = function (feed, res) {
 
   send(res, {type: 'key', key: key})
 
-  feed.ready(() => {
+  feed.ready(function () {
     if (archive) track(feed, 'metadata')
     else track(feed, null)
   })
@@ -22,7 +22,7 @@ module.exports = function (feed, res) {
   feed.on('peer-remove', onpeerremove)
 
   if (archive) {
-    archive.on('content', () => {
+    archive.on('content', function () {
       track(archive.content, 'content')
     })
   }
