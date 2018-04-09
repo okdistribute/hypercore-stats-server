@@ -9,19 +9,18 @@ npm install hypercore-stats-server
 ### Example
 
 ````
-var swarm = require('hyperdrive-archive-swarm')
+var hyperdiscovery = require('hyperdiscovery')
 var hyperdrive = require('hyperdrive')
 var http = require('http')
-var memdb = require('memdb')
+var ram = require('random-access-memory')
 var stats = require('hypercore-stats-server')
 
 // create a server
 http.createServer(function (req, res) {
 
   // set up a drive
-  var drive = hyperdrive(memdb())
-  var archive = drive.createArchive('2d8186c581cd9c1b4f45e42eb765cebcba983feb8a0525d7bffee1ce3b7a9471') // sintel.mp4
-  swarm(archive)
+  var drive = hyperdrive(ram, '72671c5004d3b956791b6ffca7f05025d62309feaf99cde04c6f434189694291')
+  hyperdiscovery(archive)
 
   // stats for the given drive will be sent to /events
   if (req.url === '/events') stats(archive, res)

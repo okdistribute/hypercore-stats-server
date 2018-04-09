@@ -1,6 +1,6 @@
 module.exports = function (feed, res) {
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
-  
+
   var archive = feed.metadata ? feed : null
 
   if (archive) {
@@ -11,8 +11,10 @@ module.exports = function (feed, res) {
 
   send(res, {type: 'key', key: key})
 
-  if (archive) track(feed, 'metadata')
-  else track(feed, null)
+  feed.ready(function () {
+    if (archive) track(feed, 'metadata')
+    else track(feed, null)
+  })
 
   send(res, {type: 'peer-update', peers: feed.peers.length})
 
@@ -20,7 +22,7 @@ module.exports = function (feed, res) {
   feed.on('peer-remove', onpeerremove)
 
   if (archive) {
-    archive.open(function () {
+    archive.on('content', function () {
       track(archive.content, 'content')
     })
   }
@@ -31,9 +33,10 @@ module.exports = function (feed, res) {
   })
 
   function track (feed, name) {
-    send(res, {type: 'feed', name: name, key: key, blocks: bitfield(feed), bytes: feed.bytes})
+    send(res, {type: 'feed', name: name, key: key, blocks: bitfield(feed), bytes: feed.byteLength})
 
     feed.on('update', onupdate)
+    feed.on('append', onupdate)
     feed.on('download', ondownload)
     feed.on('upload', onupload)
 
@@ -44,7 +47,7 @@ module.exports = function (feed, res) {
     })
 
     function onupdate () {
-      send(res, {type: 'update', name: name, key: key, blocks: bitfield(feed), bytes: feed.bytes})
+      send(res, {type: 'update', name: name, key: key, blocks: bitfield(feed), bytes: feed.byteLength})
     }
 
     function ondownload (index, data) {
@@ -66,7 +69,7 @@ module.exports = function (feed, res) {
 
   function bitfield (feed) {
     var list = []
-    for (var i = 0; i < feed.blocks; i++) {
+    for (var i = 0; i < feed.length; i++) {
       list.push(feed.has(i))
     }
     return list
