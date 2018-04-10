@@ -1,6 +1,6 @@
 {
   "name": "hypercore-stats-server",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "server for sending hypercore/hyperdrive stats over sse",
   "main": "index.js",
   "directories": {
