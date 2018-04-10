@@ -22,9 +22,13 @@ module.exports = function (feed, res) {
   feed.on('peer-remove', onpeerremove)
 
   if (archive) {
-    archive.on('content', function () {
+    if (archive.content) {
       track(archive.content, 'content')
-    })
+    } else {
+      archive.on('content', function () {
+        track(archive.content, 'content')
+      })
+    }
   }
 
   res.on('close', function () {
